@@ -3,6 +3,7 @@ require 'watir'
 require 'pry'
 require 'nokogiri'
 require 'open-uri'
+require 'tempfile'
 
 def page_opening
 	browser = Watir::Browser.new(:chrome)
@@ -12,17 +13,13 @@ def page_opening
 	search_bar_what.set(ARGV[0])
 	search_bar_where.set(ARGV[1])
 	search_bar_where.send_keys(:enter)
-	sleep(10.0)
-	#browser.driver.manage.timeouts.implicit_wait = 59
-	#puts browser.html
-	#puts browser.url.class
-	#doc = open(browser.url)
-	t = Tempfile.new
+	sleep(2)
+	t = Tempfile.new('temp_file_test_ruby')
 	t.write(browser.html)
-	doc = Nokogiri::HTML(t)
-	puts doc
-	
+	doc = Nokogiri::HTML(t.open.read)
 	puts doc.xpath('//span[@id="SEL-compteur"]').text
+	t.close
+	t.unlink
 	binding.pry
 	browser.driver.manage.timeouts.implicit_wait = 3
 	browser.link(id: 'pagination-next').click
@@ -30,12 +27,8 @@ def page_opening
 	end
 end
 
-def page_opening_2
-	doc = Nokogiri::HTML(open("https://www.starofservice.com/annubis/nord-pas-de-calais/nord/tourcoing"))
-	puts doc.xpath('//body').text
-end
+
 
 page_opening
 
-#Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36
 
